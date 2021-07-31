@@ -3,4 +3,5 @@
     <string name="navigate">navigate</string>
     <string name="label_load_data">Load Data</string>
     <string name="label_sort_data">Sort Data</string>
+    <string name="label_insert_data">Insert Data</string>
 </resources>

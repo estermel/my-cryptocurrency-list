@@ -8,9 +8,9 @@ import com.exercise.mycyprocurrency.databinding.ItemCurrencyBinding
 
 class CurrencyAdapter : RecyclerView.Adapter<CurrencyAdapter.ViewHolder>() {
 
-    private lateinit var currencies: MutableList<CurrencyInfo>
+    private lateinit var currencies: List<CurrencyInfo>
 
-    fun submitData(currencies: MutableList<CurrencyInfo>) {
+    fun submitData(currencies: List<CurrencyInfo>) {
         this.currencies = currencies
     }
 

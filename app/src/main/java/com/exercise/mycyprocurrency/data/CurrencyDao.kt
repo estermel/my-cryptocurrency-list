@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import io.reactivex.Flowable
 
 @Dao
 interface CurrencyDao {
@@ -12,9 +13,9 @@ interface CurrencyDao {
     fun insert(currencies: MutableList<CurrencyInfo>)
 
     @Query("SELECT * FROM currency_info")
-    fun getAllCurrencies() : List<CurrencyInfo>
+    fun getAllCurrencies() : Flowable<List<CurrencyInfo>>
 
     @Query("SELECT * FROM currency_info WHERE (name LIKE '%:name%')")
-    fun getCurrencyByName(name: String): List<CurrencyInfo>
+    fun getCurrencyByName(name: String): Flowable<List<CurrencyInfo>>
 
 }
