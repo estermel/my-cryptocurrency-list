@@ -4,9 +4,12 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import com.exercise.mycyprocurrency.R
 import com.exercise.mycyprocurrency.data.CurrencyInfo
 import com.exercise.mycyprocurrency.databinding.ActivityMainBinding
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity(), View.OnClickListener {
@@ -17,7 +20,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
-
+        setContentView(binding.root)
         setupListeners()
     }
 
@@ -30,10 +33,12 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.btnLoadData -> {
-                //TODO execute query selection from db, then display in fragment
+                binding.gButtons.visibility = View.GONE
+                beginCurrencyListFragment(CurrencyListFragment())
             }
             R.id.btnSortData -> {
-                //TODO sort list currency asc
+                Toast.makeText(this, "Sorting currencies ASC...", Toast.LENGTH_SHORT).show()
+                getAndSortCurrencies()
             }
             R.id.btnInsertData -> {
                 insertInitialData()
@@ -42,8 +47,31 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
+    private fun beginCurrencyListFragment(fragment: Fragment) {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.root_container, fragment)
+            .commit()
+    }
+
+    private fun getAndSortCurrencies() {
+        var sortedCurrencies = listOf<CurrencyInfo>()
+        viewModel.getAllCurrencies()
+            .subscribeOn(Schedulers.computation())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { it ->
+                sortedCurrencies = it.sortedBy { it.name }
+            }
+
+        beginCurrencyListFragment(CurrencyListFragment.newInstance(sortedCurrencies as ArrayList<CurrencyInfo>))
+    }
+
     private fun insertInitialData() {
         viewModel.insert(dummyCurrencies())
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                Toast.makeText(this, "Done inserting", Toast.LENGTH_SHORT).show()
+            }
     }
 
     private fun dummyCurrencies(): MutableList<CurrencyInfo> {

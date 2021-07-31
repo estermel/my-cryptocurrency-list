@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.exercise.mycyprocurrency.data.CurrencyDb
 import com.exercise.mycyprocurrency.data.CurrencyInfo
+import io.reactivex.Completable
 import io.reactivex.Flowable
 
 class CurrencyViewModel(
@@ -19,7 +20,7 @@ class CurrencyViewModel(
         return db.currencyDao.getCurrencyByName(name)
     }
 
-    fun insert(currencies: MutableList<CurrencyInfo>) {
+    fun insert(currencies: MutableList<CurrencyInfo>): Completable {
         return db.currencyDao.insert(currencies)
     }
 

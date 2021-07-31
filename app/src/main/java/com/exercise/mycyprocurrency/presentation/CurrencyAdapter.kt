@@ -8,10 +8,11 @@ import com.exercise.mycyprocurrency.databinding.ItemCurrencyBinding
 
 class CurrencyAdapter : RecyclerView.Adapter<CurrencyAdapter.ViewHolder>() {
 
-    private lateinit var currencies: List<CurrencyInfo>
+    private var currencies: List<CurrencyInfo>? = null
 
     fun submitData(currencies: List<CurrencyInfo>) {
         this.currencies = currencies
+        notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -21,10 +22,10 @@ class CurrencyAdapter : RecyclerView.Adapter<CurrencyAdapter.ViewHolder>() {
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(currencies[position])
+        currencies?.let { holder.bind(it[position]) }
     }
 
-    override fun getItemCount(): Int = currencies.size
+    override fun getItemCount(): Int = currencies?.size ?: 0
 
     inner class ViewHolder(private val binding: ItemCurrencyBinding) :
         RecyclerView.ViewHolder(binding.root) {
