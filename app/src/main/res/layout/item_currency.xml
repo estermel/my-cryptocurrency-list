@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:paddingBottom="@dimen/spacing_medium"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/tvCurrencyShort"
+        style="@style/TextAppearance.MaterialComponents.Subtitle2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/spacing_medium"
+        android:background="@drawable/bg_circle_grey"
+        android:gravity="center_horizontal|center_vertical"
+        android:textColor="@color/white"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="C" />
+
+    <TextView
+        android:id="@+id/tvCurrencyName"
+        style="@style/TextAppearance.MaterialComponents.Body1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/spacing_medium"
+        android:textColor="@color/cardview_dark_background"
+        app:layout_constraintBottom_toBottomOf="@id/tvCurrencyShort"
+        app:layout_constraintStart_toEndOf="@id/tvCurrencyShort"
+        app:layout_constraintTop_toTopOf="@id/tvCurrencyShort"
+        tools:text="Crypto.com" />
+
+    <TextView
+        android:id="@+id/tvCurrencySymbol"
+        style="@style/TextAppearance.MaterialComponents.Body2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/spacing_medium"
+        android:textColor="@android:color/tertiary_text_light"
+        app:layout_constraintBottom_toBottomOf="@id/tvCurrencyShort"
+        app:layout_constraintTop_toTopOf="@id/tvCurrencyShort"
+        app:layout_constraintEnd_toStartOf="@id/ivNav"
+        tools:text="MCO"/>
+
+    <ImageView
+        android:id="@+id/ivNav"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/spacing_normal"
+        android:layout_marginEnd="@dimen/spacing_normal"
+        android:src="@drawable/ic_baseline_navigate_next_24"
+        app:layout_constraintTop_toTopOf="@id/tvCurrencyShort"
+        app:layout_constraintBottom_toBottomOf="@id/tvCurrencyShort"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:contentDescription="@string/navigate"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
