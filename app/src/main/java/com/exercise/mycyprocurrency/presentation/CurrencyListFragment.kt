@@ -1,51 +1,43 @@
 package com.exercise.mycyprocurrency.presentation
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.exercise.mycyprocurrency.R
-import com.exercise.mycyprocurrency.data.CurrencyInfo
 import com.exercise.mycyprocurrency.databinding.FragmentCurrencyListBinding
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class CurrencyListFragment : Fragment(R.layout.fragment_currency_list),
-    SearchView.OnQueryTextListener {
+    SearchView.OnQueryTextListener, CurrencyAdapter.OnItemClickListener {
 
     private val viewModel by viewModel<CurrencyViewModel>()
     private lateinit var currencyAdapter: CurrencyAdapter
     private lateinit var binding: FragmentCurrencyListBinding
-    private var sortedCurrencies: MutableList<CurrencyInfo>? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentCurrencyListBinding.bind(view)
         setupAdapter()
-        setCurrencies()
+        getCurrencyList()
         binding.searchView.setOnQueryTextListener(this)
+        currencyAdapter.setListener(this)
     }
 
-    private fun isFromSortedCurrencies(arguments: Bundle): Boolean {
-        return arguments.containsKey(BUNDLE_CURRENCIES)
-    }
-
-    private fun setSortedCurrencies(arguments: Bundle) {
-        val bundle = arguments.getParcelableArrayList<CurrencyInfo>(BUNDLE_CURRENCIES)
-        bundle?.let {
-            sortedCurrencies = mutableListOf()
-            with(sortedCurrencies) { this?.addAll(bundle) }
-        }
-    }
-
-    private fun setCurrencies() {
-        arguments?.let {
-            if (isFromSortedCurrencies(it)) setSortedCurrencies(it)
-            else loadCurrencies()
+    private fun getCurrencyList() {
+        arguments?.let { args ->
+            args.containsKey(BUNDLE_CURRENCIES).let {
+                if (args.getString(BUNDLE_CURRENCIES).equals(KEY_ALL_SORTED_CURRENCIES))
+                    loadSortedCurrencies()
+                else
+                    loadCurrencies()
+            }
         }
     }
 
@@ -67,41 +59,66 @@ class CurrencyListFragment : Fragment(R.layout.fragment_currency_list),
     }
 
     private fun loadCurrencies() {
-        Toast.makeText(this@CurrencyListFragment.context, "Loading currencies", Toast.LENGTH_SHORT)
-            .show()
-
         viewModel.getAllCurrencies()
             .subscribeOn(Schedulers.computation())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
+                hideError()
+                currencyAdapter.submitData(it)
+            }
+    }
+
+    private fun loadSortedCurrencies() {
+        viewModel.getAllSortedCurrencies()
+            .subscribeOn(Schedulers.computation())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                hideError()
                 currencyAdapter.submitData(it)
             }
     }
 
     private fun getCurrenciesByName(query: String) {
-        Toast.makeText(this@CurrencyListFragment.context, "Searching currency", Toast.LENGTH_SHORT)
-            .show()
-
         viewModel.getCurrenciesByName("%$query%")
             .subscribeOn(Schedulers.computation())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
-                Log.d("currencies", "by name $query: $it")
-                currencyAdapter.submitData(it)
-                currencyAdapter.notifyDataSetChanged()
+                if (it.isEmpty()) {
+                    showError("Result for '$query' not found")
+                } else {
+                    hideError()
+                    currencyAdapter.submitData(it)
+                }
             }
+    }
+
+    private fun showError(message: String) {
+        binding.rvCurrency.visibility = GONE
+        binding.tvError.visibility = VISIBLE
+        binding.tvError.text = message
+    }
+
+    private fun hideError() {
+        binding.rvCurrency.visibility = VISIBLE
+        binding.tvError.visibility = GONE
     }
 
     companion object {
         private const val BUNDLE_CURRENCIES = "BUNDLE_CURRENCIES"
+        const val KEY_ALL_CURRENCIES = "KEY_ALL_CURRENCIES"
+        const val KEY_ALL_SORTED_CURRENCIES = "KEY_ALL_SORTED_CURRENCIES"
 
-        fun newInstance(currencies: ArrayList<CurrencyInfo>): CurrencyListFragment {
+        fun newInstance(actionKey: String): CurrencyListFragment {
             val fragment = CurrencyListFragment()
             val bundle = Bundle()
-            bundle.putParcelableArrayList(BUNDLE_CURRENCIES, currencies)
+            bundle.putString(BUNDLE_CURRENCIES, actionKey)
             fragment.arguments = bundle
             return fragment
         }
+    }
+
+    override fun onItemClicked() {
+        Toast.makeText(this@CurrencyListFragment.context, "Item clicked", Toast.LENGTH_SHORT).show()
     }
 
 }

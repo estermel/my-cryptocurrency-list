@@ -11,4 +11,8 @@ data class CurrencyInfo(
     @PrimaryKey(autoGenerate = false) val id: String,
     val name: String,
     val symbol: String
-) : Parcelable
+) : Parcelable, Comparable<CurrencyInfo> {
+
+    override fun compareTo(other: CurrencyInfo): Int = this.name.compareTo(other.name)
+
+}

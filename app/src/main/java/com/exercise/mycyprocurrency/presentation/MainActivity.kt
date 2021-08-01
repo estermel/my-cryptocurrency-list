@@ -2,7 +2,6 @@ package com.exercise.mycyprocurrency.presentation
 
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.exercise.mycyprocurrency.R
@@ -22,27 +21,21 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setupListeners()
+        insertInitialData()
     }
 
     private fun setupListeners() {
         binding.btnLoadData.setOnClickListener(this)
         binding.btnSortData.setOnClickListener(this)
-        binding.btnInsertData.setOnClickListener(this)
     }
 
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.btnLoadData -> {
-                binding.gButtons.visibility = View.GONE
-                beginCurrencyListFragment(CurrencyListFragment())
+                beginCurrencyListFragment(CurrencyListFragment.newInstance(CurrencyListFragment.KEY_ALL_CURRENCIES))
             }
             R.id.btnSortData -> {
-                Toast.makeText(this, "Sorting currencies ASC...", Toast.LENGTH_SHORT).show()
-                getAndSortCurrencies()
-            }
-            R.id.btnInsertData -> {
-                insertInitialData()
-                Toast.makeText(this, "Done inserting", Toast.LENGTH_SHORT).show()
+                beginCurrencyListFragment(CurrencyListFragment.newInstance(CurrencyListFragment.KEY_ALL_SORTED_CURRENCIES))
             }
         }
     }
@@ -53,25 +46,13 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             .commit()
     }
 
-    private fun getAndSortCurrencies() {
-        var sortedCurrencies = listOf<CurrencyInfo>()
-        viewModel.getAllCurrencies()
-            .subscribeOn(Schedulers.computation())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { it ->
-                sortedCurrencies = it.sortedBy { it.name }
-            }
-
-        beginCurrencyListFragment(CurrencyListFragment.newInstance(sortedCurrencies as ArrayList<CurrencyInfo>))
-    }
-
     private fun insertInitialData() {
-        viewModel.insert(dummyCurrencies())
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe {
-                Toast.makeText(this, "Done inserting", Toast.LENGTH_SHORT).show()
-            }
+        if (viewModel.isCurrencyEmpty()) {
+            viewModel.insert(dummyCurrencies())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {}
+        }
     }
 
     private fun dummyCurrencies(): MutableList<CurrencyInfo> {

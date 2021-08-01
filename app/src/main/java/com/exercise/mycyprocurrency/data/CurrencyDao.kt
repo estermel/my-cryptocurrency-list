@@ -14,7 +14,10 @@ interface CurrencyDao {
     fun insert(currencies: MutableList<CurrencyInfo>): Completable
 
     @Query("SELECT * FROM currency_info")
-    fun getAllCurrencies() : Flowable<List<CurrencyInfo>>
+    fun getAllCurrencies(): Flowable<List<CurrencyInfo>>
+
+    @Query("SELECT * FROM currency_info ORDER BY name ASC")
+    fun getAllSortedCurrencies(): Flowable<List<CurrencyInfo>>
 
     @Query("SELECT * FROM currency_info WHERE name LIKE :name")
     fun getCurrencyByName(name: String): Flowable<List<CurrencyInfo>>

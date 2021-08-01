@@ -9,6 +9,7 @@ import com.exercise.mycyprocurrency.databinding.ItemCurrencyBinding
 class CurrencyAdapter : RecyclerView.Adapter<CurrencyAdapter.ViewHolder>() {
 
     private var currencies: List<CurrencyInfo>? = null
+    private lateinit var listener: OnItemClickListener
 
     fun submitData(currencies: List<CurrencyInfo>) {
         this.currencies = currencies
@@ -27,6 +28,14 @@ class CurrencyAdapter : RecyclerView.Adapter<CurrencyAdapter.ViewHolder>() {
 
     override fun getItemCount(): Int = currencies?.size ?: 0
 
+    fun setListener(listener: OnItemClickListener) {
+        this.listener = listener
+    }
+
+    interface OnItemClickListener {
+        fun onItemClicked()
+    }
+
     inner class ViewHolder(private val binding: ItemCurrencyBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
@@ -34,6 +43,7 @@ class CurrencyAdapter : RecyclerView.Adapter<CurrencyAdapter.ViewHolder>() {
             binding.tvCurrencyShort.text = currency.name[0].toString()
             binding.tvCurrencyName.text = currency.name
             binding.tvCurrencySymbol.text = currency.symbol
+            binding.root.setOnClickListener { listener.onItemClicked() }
         }
 
     }
